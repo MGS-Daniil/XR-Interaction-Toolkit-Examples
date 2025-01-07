@@ -3898,6 +3898,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2216814198869864760, guid: f987e56f5c36e264e888555e47dec1bc, type: 3}
+      propertyPath: m_Value.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2216814198869864760, guid: f987e56f5c36e264e888555e47dec1bc, type: 3}
+      propertyPath: m_Value.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2216814198869864760, guid: f987e56f5c36e264e888555e47dec1bc, type: 3}
+      propertyPath: m_JoystickMotion
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5162356030215288089, guid: f987e56f5c36e264e888555e47dec1bc, type: 3}
       propertyPath: m_Name
       value: Joystick
