@@ -9,7 +9,9 @@ public class BoatController : MonoBehaviour
     public Camera mainCamera, camera1;
     public XRKnob knob;
     public XRJoystick joystick;
-
+    public Transform panelTransform;
+    public Transform standTransform;
+    
     void Start()
     {
         rigidbody = GetComponent<Rigidbody>();
@@ -23,6 +25,9 @@ public class BoatController : MonoBehaviour
 
         rigidbody.AddForce(transform.forward * vertical * verticalSpeed);
         rigidbody.AddTorque(transform.up * horizontal * horizontalSpeed);
+        
+        panelTransform.position = standTransform.position;
+        panelTransform.rotation = standTransform.rotation;
 
         // if (Input.GetKeyDown(KeyCode.C))
         // {
