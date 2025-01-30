@@ -4,6 +4,7 @@ using UnityEngine.XR.Content.Interaction;
 public class BoatController : MonoBehaviour
 {
     private Rigidbody rigidbody;
+    private bool isStarted;
     public float horizontalSpeed = 5f;
     public float verticalSpeed = 20f;
     public Camera mainCamera, camera1;
@@ -20,6 +21,10 @@ public class BoatController : MonoBehaviour
     void Update()
     {
         // var horizontal = Input.GetAxis("Horizontal");
+        if (isStarted)
+        {
+        }
+
         var horizontal = knob.value-0.5f;
         var vertical = joystick.value.x;
 
