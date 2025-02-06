@@ -1,20 +1,20 @@
-using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.XR.Content.Interaction;
 
 public class BoatController : MonoBehaviour
 {
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private float horizontalSpeed = 5f;
+    [SerializeField] private float verticalSpeed = 20f;
+    [SerializeField] private Camera mainCamera, camera1;
+    [SerializeField] private XRKnob knob;
+    [SerializeField] private XRJoystick joystick;
+    [SerializeField] private Transform panelTransform;
+    [SerializeField] private Transform standTransform;
+    [SerializeField] private GameObject controlPanel;
     private Rigidbody rigidbody;
     private bool isStarted;
     private GameObject lightGameObject;
-    public float horizontalSpeed = 5f;
-    public float verticalSpeed = 20f;
-    public Camera mainCamera, camera1;
-    public XRKnob knob;
-    public XRJoystick joystick;
-    public Transform panelTransform;
-    public Transform standTransform;
-    public GameObject controlPanel;
 
     void Start()
     {
@@ -24,21 +24,24 @@ public class BoatController : MonoBehaviour
 
     void Update()
     {
+        panelTransform.position = standTransform.position;
+        panelTransform.rotation = standTransform.rotation;
+        
+        if(!isStarted) return;
         // var horizontal = Input.GetAxis("Horizontal");
-        var horizontal = 0f;
-        var vertical = 0f;
-        if (isStarted)
+        var horizontal = knob.value - 0.5f;
+        var vertical = joystick.value.y;
+        print(joystick.value.ToString());
+
+        if (vertical > 0.1f)
         {
-            horizontal = knob.value - 0.5f;
-            vertical = joystick.value.x;
+            audioSource.pitch = vertical * 2.0f;
         }
-
-
+        
         rigidbody.AddForce(transform.forward * vertical * verticalSpeed);
         rigidbody.AddTorque(transform.up * horizontal * horizontalSpeed);
 
-        panelTransform.position = standTransform.position;
-        panelTransform.rotation = standTransform.rotation;
+      
 
         // if (Input.GetKeyDown(KeyCode.C))
         // {
@@ -50,6 +53,15 @@ public class BoatController : MonoBehaviour
     {
         isStarted = !isStarted;
         lightGameObject.SetActive(isStarted);
+        if (isStarted)
+        {
+            audioSource.Play();
+            audioSource.pitch = 1f;
+        }
+        else
+        {
+           audioSource.Stop(); 
+        }
     }
 
     public void SwitchCamera()
