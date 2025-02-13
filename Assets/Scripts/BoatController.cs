@@ -24,14 +24,13 @@ public class BoatController : MonoBehaviour
 
     void Update()
     {
-        panelTransform.position = standTransform.position;
-        panelTransform.rotation = standTransform.rotation;
+        //panelTransform.position = standTransform.position;
+        //panelTransform.rotation = standTransform.rotation;
         
         if(!isStarted) return;
         // var horizontal = Input.GetAxis("Horizontal");
         var horizontal = knob.value - 0.5f;
         var vertical = joystick.value.y;
-        print(joystick.value.ToString());
 
         if (vertical > 0.1f)
         {
