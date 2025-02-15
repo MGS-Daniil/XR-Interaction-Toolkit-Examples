@@ -1,124 +1,108 @@
-using System;
 using System.Collections.Generic;
-using Sirenix.OdinInspector;
 using UnityEngine;
-using Random = UnityEngine.Random;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 public class WaterManager : MonoBehaviour
 {
-    private Mesh myMesh;
+    private Mesh mesh;
     private MeshFilter meshFilter;
-
-    public static WaterManager instance;
-    public float amplitude, frequency;
-    [SerializeField] private Vector2 planeSize = new Vector2(1, 1);
-    [SerializeField] private int planeResolution = 1;
-    [SerializeField] private float speed = 1f;
-
     private List<Vector3> vertices;
-    private List<int> triangels;
+    private List<int> triangles;
 
-    private void Awake()
+    private float amplitude;
+    private float frequency;
+    private float speed;
+    private int resolution;
+    private float chunkSize;
+
+    private bool isInitialized = false;
+
+    private void Start()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else if (instance != this)
-        {
-            Destroy(this);
-        }
-
-        CreatePlane();
-    }
-
-    [Button]
-    private void CreatePlane()
-    {
-        myMesh = new Mesh();
         meshFilter = GetComponent<MeshFilter>();
-        meshFilter.mesh = myMesh;
-        GeneratePlane(planeSize, planeResolution);
-        Noise(Time.timeSinceLevelLoad);
-        AssignMesh();
+
+        if (WaterChunkManager.instance != null)
+        {
+            WaterChunkManager.instance.RegisterChunk(this);
+        }
     }
 
+    public void UpdateSettings(float newAmplitude, float newFrequency, float newSpeed, int newResolution)
+    {
+        amplitude = newAmplitude;
+        frequency = newFrequency;
+        speed = newSpeed;
+        resolution = newResolution;
+        chunkSize = WaterChunkManager.instance.chunkSize;
+
+        GenerateMesh();
+        isInitialized = true;
+    }
 
     private void Update()
     {
-        Noise(Time.timeSinceLevelLoad);
-        AssignMesh();
-
-        // Vector3[] vertices = meshFilter.mesh.vertices;
-        // for (int i = 0; i < vertices.Length; i++)
-        // {
-        //     vertices[i].y = WaveManager.instance.GetWaveHeight(transform.position.x + vertices[i].x);
-        // }
-        //
-        // meshFilter.mesh.vertices = vertices;
-        // meshFilter.mesh.RecalculateNormals();
+        if (isInitialized)
+        {
+            UpdateWave();
+        }
     }
 
-    void GeneratePlane(Vector2 size, int resolution)
+    private void GenerateMesh()
     {
+        mesh = new Mesh();
         vertices = new List<Vector3>();
-        float xPerStep = size.x / resolution;
-        float yPerStep = size.y / resolution;
+        triangles = new List<int>();
 
-        for (int y = 0; y < resolution + 1; y++)
+        float stepSize = chunkSize / resolution;
+
+        for (int z = 0; z <= resolution; z++)
         {
-            for (int x = 0; x < resolution + 1; x++)
+            for (int x = 0; x <= resolution; x++)
             {
-                vertices.Add(new Vector3(x * xPerStep, 0, y * yPerStep));
+                vertices.Add(new Vector3(x * stepSize, 0, z * stepSize));
             }
         }
 
-        triangels = new List<int>();
-        for (int row = 0; row < resolution; row++)
+        for (int z = 0; z < resolution; z++)
         {
-            for (int column = 0; column < resolution; column++)
+            for (int x = 0; x < resolution; x++)
             {
-                int i = row * resolution + row + column;
+                int i = z * (resolution + 1) + x;
 
-                triangels.Add(i);
-                triangels.Add(i + (resolution) + 1);
-                triangels.Add(i + (resolution) + 2);
+                triangles.Add(i);
+                triangles.Add(i + resolution + 1);
+                triangles.Add(i + 1);
 
-                triangels.Add(i);
-                triangels.Add(i + resolution + 2);
-                triangels.Add(i + 1);
+                triangles.Add(i + 1);
+                triangles.Add(i + resolution + 1);
+                triangles.Add(i + resolution + 2);
             }
         }
+
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        mesh.RecalculateTangents();
+        meshFilter.mesh = mesh;
     }
 
-    void AssignMesh()
+    private void UpdateWave()
     {
-        myMesh.Clear();
-        myMesh.vertices = vertices.ToArray();
-        myMesh.triangles = triangels.ToArray();
-    }
+        Vector3[] updatedVertices = mesh.vertices;
+        float time = Time.timeSinceLevelLoad;
 
-    void LeftToRightSine(float time)
-    {
-        for (int i = 0; i < vertices.Count; i++)
+        for (int i = 0; i < updatedVertices.Length; i++)
         {
             Vector3 vertex = vertices[i];
-            vertex.y = Mathf.Sin(time + vertex.x);
-            vertices[i] = vertex;
+            vertex.y = Mathf.PerlinNoise((transform.position.x+ vertex.x*transform.localScale.x + time * speed) / frequency, (transform.position.z + vertex.z *transform.localScale.x+ time * speed) / frequency) * amplitude;
+            updatedVertices[i] = vertex;
         }
-    }
 
-    void Noise(float time)
-    {
-        for (int i = 0; i < vertices.Count; i++)
-        {
-            Vector3 vertex = vertices[i];
-            vertex.y = Mathf.PerlinNoise((vertex.x + time * speed) / frequency, (vertex.z + time * speed) / frequency) *
-                       amplitude;
-            vertices[i] = vertex;
-        }
+        mesh.vertices = updatedVertices;
+        mesh.RecalculateNormals();
     }
 
     public float GetWaveHeight(float x, float z)
