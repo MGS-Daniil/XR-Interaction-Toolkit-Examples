@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.XR.Content.Interaction;
 
@@ -14,12 +15,10 @@ public class BoatController : MonoBehaviour
     [SerializeField] private GameObject controlPanel;
     [SerializeField] private bool isStarted;
     private Rigidbody rigidbody;
-    private GameObject lightGameObject;
 
     void Start()
     {
         rigidbody = GetComponent<Rigidbody>();
-        lightGameObject = controlPanel.transform.GetChild(8).gameObject;
     }
 
     void Update()
@@ -45,11 +44,10 @@ public class BoatController : MonoBehaviour
         //     SwitchCamera();
         // }
     }
-
+    
     public void ChangeMotorState()
     {
         isStarted = !isStarted;
-        lightGameObject.SetActive(isStarted);
         if (isStarted)
         {
             audioSource.Play();
