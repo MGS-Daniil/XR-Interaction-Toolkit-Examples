@@ -14,6 +14,7 @@ public class BoatController : MonoBehaviour
     [SerializeField] private Transform standTransform;
     [SerializeField] private GameObject controlPanel;
     [SerializeField] private bool isStarted;
+    [SerializeField] private bool isPC;
     private Rigidbody rigidbody;
 
     void Start()
@@ -26,11 +27,20 @@ public class BoatController : MonoBehaviour
         //panelTransform.position = standTransform.position;
         //panelTransform.rotation = standTransform.rotation;
         
-        if(!isStarted) return;
+        if(!isStarted && !isPC) return;
         // var horizontal = Input.GetAxis("Horizontal");
-        var vertical = -joystick.value.y;
-        var horizontal = (knob.value - 0.5f) * Mathf.Abs(vertical);
-
+        float vertical, horizontal;
+        if (!isPC)
+        {
+            vertical = -joystick.value.y;
+            horizontal = (knob.value - 0.5f) * Mathf.Abs(vertical);
+        }
+        else
+        {
+            vertical = Input.GetAxis("Vertical");
+            horizontal = Input.GetAxis("Horizontal");
+        }
+        
         if (vertical > 0.1f)
         {
             audioSource.pitch = vertical * 2.0f;

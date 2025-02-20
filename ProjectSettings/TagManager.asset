@@ -10,6 +10,7 @@ TagManager:
   - MiniWorldCamera
   - Water
   - magazine
+  - Transport
   layers:
   - Default
   - TransparentFX
