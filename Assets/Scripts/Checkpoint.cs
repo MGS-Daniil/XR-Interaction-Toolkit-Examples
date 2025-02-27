@@ -9,7 +9,7 @@ public class Checkpoint : MonoBehaviour
     {
         if (!other.CompareTag("Transport")) return;
 
-        trackManager.checkCheckpoint(index);
+        trackManager.CheckCheckpoint(index);
     }
 
     public void Init(TrackManager trackManager, int index)

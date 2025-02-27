@@ -15,7 +15,7 @@ public class TrackManager : MonoBehaviour
         }
     }
 
-    public void checkCheckpoint(int id)
+    public void CheckCheckpoint(int id)
     {
         if (id != currentCheckpoint + 1) return;
         currentCheckpoint += 1;
